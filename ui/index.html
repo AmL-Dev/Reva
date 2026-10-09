@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reva</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%237c5cf0'/%3E%3Crect x='5' y='5' width='6' height='6' rx='1.5' fill='none' stroke='white' stroke-width='1.6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e1014;--surface:#15181d;--surface2:#1b1f26;--border:#262b33;--border2:#343a45;
+  --text:#e6e8eb;--text2:#a7aeb9;--text3:#7a828e;
+  --brand:#8b6cf6;--brand-ink:#ffffff;--brand-text:#b9a6fb;--brand-bg:rgba(139,108,246,.12);
+  --danger:#f06269;--danger-bg:rgba(240,98,105,.12);--success:#3fbf86;--success-bg:rgba(63,191,134,.12);
+  --warn:#e5a93d;--warn-bg:rgba(229,169,61,.12);
+  --add-bg:rgba(63,191,134,.14);--add:#9ee6c2;--del-bg:rgba(240,98,105,.14);--del:#ffb3b7;--code-bg:#0b0d10;
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+:root[data-theme="light"]{
+  --bg:#f6f7f9;--surface:#ffffff;--surface2:#f1f3f6;--border:#e3e6ea;--border2:#d3d8de;
+  --text:#16181d;--text2:#4b5361;--text3:#6b7380;
+  --brand:#6d4fe0;--brand-text:#5b3fd0;--brand-bg:rgba(109,79,224,.09);
+  --danger:#cf3139;--danger-bg:rgba(207,49,57,.08);--success:#1d8a58;--success-bg:rgba(29,138,88,.09);
+  --warn:#a86a00;--warn-bg:rgba(168,106,0,.09);
+  --add-bg:#e6f6ee;--add:#13623e;--del-bg:#fdecec;--del:#9b1c22;--code-bg:#f8f9fb;
+  --shadow:0 1px 2px rgba(16,24,40,.06);
+}
+/* names the recorded-replay bar (demo/replay_driver.js) styles itself with */
+:root{--panel:var(--surface);--panel2:var(--surface2);--line:var(--border);--line2:var(--border2);
+  --fg:var(--text);--mut:var(--text2);--pur:var(--brand);--purbg:var(--brand-bg);--cyn:var(--brand)}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;display:flex;flex-direction:column;background:var(--bg);color:var(--text);
+  font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+code,.mono{font-family:var(--mono);font-size:.9em}
+a{color:var(--brand-text);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ---------- header ---------- */
+header{display:flex;align-items:center;gap:22px;padding:0 24px;height:60px;background:var(--surface);
+  border-bottom:1px solid var(--border);flex:none}
+.logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:18px;letter-spacing:-.2px}
+.logo i{width:24px;height:24px;border-radius:6px;background:var(--brand);display:grid;place-items:center}
+.logo i::after{content:"";width:8px;height:8px;border:2px solid #fff;border-radius:2px}
+.project{display:flex;align-items:center;gap:8px;color:var(--text2);font-size:14px;padding-left:22px;border-left:1px solid var(--border)}
+.project b{color:var(--text);font-weight:600}
+.live{width:8px;height:8px;border-radius:50%;background:var(--text3)}
+.live.ok{background:var(--success);box-shadow:0 0 0 3px var(--success-bg)}
+.live.bad{background:var(--danger)}
+nav{display:flex;gap:2px;height:100%}
+nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:7px;padding:0 14px;font-weight:500;
+  color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px}
+nav button:hover{color:var(--text)}
+nav button:focus-visible{outline:2px solid var(--brand);outline-offset:-4px}
+nav button[aria-selected="true"]{color:var(--text);border-bottom-color:var(--brand)}
+nav .count{min-width:20px;height:20px;padding:0 6px;border-radius:10px;font-size:12px;font-weight:600;
+  display:inline-grid;place-items:center;background:var(--surface2);color:var(--text2)}
+nav .count.hot{background:var(--danger);color:#fff}
+.sp{flex:1}
+.btn{font:500 14px/1 var(--sans);cursor:pointer;border-radius:7px;padding:9px 14px;border:1px solid var(--border2);
+  background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:7px;transition:background .12s,border-color .12s}
+.btn:hover:not(:disabled){background:var(--surface2);text-decoration:none}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-ink);font-weight:600}
+.btn.primary:hover:not(:disabled){filter:brightness(1.08);background:var(--brand)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--text2)}
+.btn.ghost:hover:not(:disabled){color:var(--text);background:var(--surface2)}
+.btn.sm{padding:6px 10px;font-size:13px}
+
+/* ---------- layout ---------- */
+.body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 380px}
+.content{overflow-y:auto;padding:28px 32px 48px}
+.content > div{max-width:940px;margin:0 auto}
+aside{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;min-height:0}
+.view[hidden]{display:none}
+
+/* ---------- status line ---------- */
+.headline{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.headline h1{margin:0;font-size:24px;font-weight:600;letter-spacing:-.3px}
+.lede{color:var(--text2);margin:0 0 22px;max-width:680px}
+.working{display:flex;align-items:center;gap:12px;padding:12px 16px;margin-bottom:16px;border-radius:10px;
+  background:var(--brand-bg);border:1px solid var(--border2);color:var(--text)}
+.working[hidden]{display:none}
+.spin{width:16px;height:16px;flex:none;border-radius:50%;border:2px solid var(--brand);border-top-color:transparent;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.working small{color:var(--text2);margin-left:auto;font-size:13px}
+
+/* ---------- issue card ---------- */
+.issue{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
+.issue.new{animation:rise .35s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}}
+.ih{padding:18px 20px 14px}
+.ititle{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ititle h2{margin:0;font-size:18px;font-weight:600;letter-spacing:-.2px}
+.sev{font-size:12px;font-weight:600;padding:2px 8px;border-radius:5px}
+.sev.high{background:var(--danger-bg);color:var(--danger)}
+.sev.medium{background:var(--warn-bg);color:var(--warn)}
+.sev.low{background:var(--surface2);color:var(--text2)}
+.imeta{margin-top:4px;color:var(--text3);font-size:13.5px;display:flex;gap:6px;flex-wrap:wrap}
+.imeta a{font-family:var(--mono);font-size:13px}
+.isum{margin:10px 0 0;color:var(--text2)}
+.isum code{color:var(--text)}
+.trail{list-style:none;margin:0;padding:4px 20px 6px;border-top:1px solid var(--border)}
+.trail li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.trail li:last-child{border-bottom:0}
+.ic{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;margin-top:1px}
+.ic.ok{background:var(--success-bg);color:var(--success)}
+.ic.fail{background:var(--danger-bg);color:var(--danger)}
+.ic.wait{border:1.5px dashed var(--border2)}
+.ic.run{border:2px solid var(--brand);border-top-color:transparent;animation:spin .8s linear infinite}
+.tl{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.tl b{font-weight:600}
+li.wait .tl b{color:var(--text3);font-weight:500}
+.tl span{color:var(--text2)}
+.tx{color:var(--text2);margin:2px 0 4px;font-size:14px;overflow-wrap:anywhere}
+.tx code{color:var(--text)}
+.link{all:unset;cursor:pointer;color:var(--brand-text);font-size:13px;font-weight:500}
+.link:hover{text-decoration:underline}
+.link:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:3px}
+pre{margin:8px 0 0;font:12.5px/1.6 var(--mono);background:var(--code-bg);border:1px solid var(--border);border-radius:8px;
+  overflow:auto;max-height:300px;padding:6px 0}
+pre div{padding:0 12px;white-space:pre;min-width:max-content}
+pre.wrap div{white-space:pre-wrap;min-width:0;overflow-wrap:anywhere}
+pre .a{background:var(--add-bg);color:var(--add)}
+pre .d{background:var(--del-bg);color:var(--del)}
+pre .h{color:var(--text3)}
+.actions{display:flex;align-items:center;gap:8px;padding:12px 20px;background:var(--surface2);border-top:1px solid var(--border);flex-wrap:wrap}
+.actions .note{color:var(--text3);font-size:13px}
+.actions .push{margin-left:auto}
+
+.empty{text-align:center;padding:56px 24px;background:var(--surface);border:1px dashed var(--border2);border-radius:12px}
+.empty .big{width:44px;height:44px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;
+  background:var(--success-bg);color:var(--success);font-size:22px}
+.empty h3{margin:0 0 6px;font-size:18px;font-weight:600}
+.empty p{margin:0 auto;color:var(--text2);max-width:520px}
+
+.resolved{margin-top:28px}
+.resolved h3{font-size:13px;font-weight:600;color:var(--text3);margin:0 0 8px}
+.rrow{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);
+  border-radius:9px;margin-bottom:6px;color:var(--text3);font-size:14px;flex-wrap:wrap}
+.rrow b{color:var(--text);font-weight:500}
+.rrow .tag{font-size:12px;font-weight:600;padding:2px 8px;border-radius:5px;background:var(--surface2);color:var(--text2)}
+.rrow .tag.applied{background:var(--success-bg);color:var(--success)}
+
+/* ---------- activity rail ---------- */
+.railh{padding:16px 18px 10px;display:flex;align-items:baseline;gap:8px}
+.railh b{font-weight:600}
+.railh span{color:var(--text3);font-size:13px;margin-left:auto}
+#activity{overflow-y:auto;flex:1;padding:0 10px 16px}
+.ev{padding:9px 10px;border-radius:8px;cursor:pointer}
+.ev:hover{background:var(--surface2)}
+.ev .r1{display:flex;align-items:center;gap:8px}
+.ev .fn{font-family:var(--mono);font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ev time{margin-left:auto;color:var(--text3);font-size:12px;flex:none}
+.ev .r2{display:flex;align-items:center;gap:8px;margin-top:2px;font-size:12.5px;color:var(--text3)}
+.ev .file{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{flex:none;font-size:11.5px;font-weight:600;padding:1px 7px;border-radius:10px;background:var(--surface2);color:var(--text2);margin-left:auto}
+.pill.run{background:var(--brand-bg);color:var(--brand-text)}
+.pill.bad{background:var(--danger-bg);color:var(--danger)}
+.pill.good{background:var(--success-bg);color:var(--success)}
+.ev pre{max-height:220px}
+.ev.new{animation:rise .3s ease-out}
+.railf{padding:10px 18px;border-top:1px solid var(--border);color:var(--text3);font-size:12.5px}
+
+/* ---------- threat model / insights ---------- */
+.seg{margin-left:auto;display:inline-flex;padding:3px;border-radius:8px;background:var(--surface2);border:1px solid var(--border)}
+.seg button{all:unset;cursor:pointer;padding:5px 14px;border-radius:6px;font-size:13.5px;font-weight:500;color:var(--text2)}
+.seg button:hover{color:var(--text)}
+.seg button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.graph{padding:18px 18px 8px}
+.graph svg{display:block;width:100%;height:auto}
+.graph text{font:14px var(--sans);fill:var(--text)}
+.graph .mono{font:13.5px var(--mono)}
+.graph .sub{font:12px var(--sans);fill:var(--text3)}
+.graph .colh{font:600 12px var(--sans);fill:var(--text3)}
+.gnode rect{fill:var(--surface2);stroke:var(--border2);stroke-width:1.2}
+.gnode.src rect{stroke:var(--border2)}
+.gnode.open rect{stroke:var(--danger);fill:var(--danger-bg)}
+.gnode.safe rect{stroke:color-mix(in srgb,var(--success) 55%,var(--border2))}
+.gnode.proven rect{stroke:var(--danger);stroke-width:2;fill:var(--danger-bg)}
+.gnode.fixed rect{stroke:var(--success);stroke-width:2;fill:var(--success-bg)}
+.gnode.cand rect{stroke:var(--brand);stroke-dasharray:5 4;fill:var(--brand-bg)}
+.gnode .dot{stroke:none}
+.gedge{fill:none;stroke-width:1.6;stroke:color-mix(in srgb,var(--success) 45%,transparent)}
+.gedge.open{stroke:var(--danger);stroke-width:2.4}
+.glegend{display:flex;gap:18px;flex-wrap:wrap;padding:10px 18px 14px;color:var(--text3);font-size:13px}
+.glegend i{display:inline-block;width:18px;height:0;border-top:2px solid;vertical-align:middle;margin-right:7px}
+.glegend b{display:inline-block;width:12px;height:12px;border-radius:3px;border:1.5px solid;vertical-align:-1px;margin-right:7px}
+.sec{margin-bottom:30px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-weight:600;color:var(--text3);font-size:12.5px;padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td code{color:var(--text)}
+td small{display:block;color:var(--text3);font-size:12.5px}
+.st{font-size:12px;font-weight:600;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.st.open{background:var(--danger-bg);color:var(--danger)}
+.st.guarded{background:var(--success-bg);color:var(--success)}
+.prop{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border);align-items:center}
+.prop:last-child{border-bottom:0}
+.prop p{margin:2px 0 0;color:var(--text2);font-size:14px}
+.prop.dismissed > div:first-child{opacity:.55}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.notes .card{padding:14px 16px}
+.notes h4{margin:0 0 6px;font-size:13px;font-weight:600;color:var(--text3)}
+.notes ul{margin:0;padding-left:18px;color:var(--text2);font-size:14px}
+.badge{font-size:12px;font-weight:600;padding:2px 8px;border-radius:5px;background:var(--brand-bg);color:var(--brand-text)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat{padding:14px 16px}
+.stat b{display:block;font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.stat span{color:var(--text3);font-size:13px}
+.meter{height:8px;border-radius:4px;background:var(--surface2);overflow:hidden;min-width:120px}
+.meter i{display:block;height:100%;background:var(--brand)}
+.muted{color:var(--text3)}
+
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+  background:var(--text);color:var(--bg);padding:10px 16px;border-radius:9px;font-weight:500;transition:all .2s;z-index:10;max-width:80vw}
+#toast.on{opacity:1;transform:translateX(-50%)}
+#toast.err{background:var(--danger);color:#fff}
+
+@media (max-width:1100px){.body{grid-template-columns:1fr}aside{display:none}.content{padding:20px 16px}
+  .project{display:none}.stats{grid-template-columns:repeat(2,1fr)}header{gap:10px;padding:0 16px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><i></i>Reva</div>
+  <div class="project"><span class="live" id="dot"></span><b id="repo">—</b><span id="connt">connecting</span></div>
+  <nav role="tablist">
+    <button role="tab" data-tab="issues" aria-selected="true">Issues <span class="count" id="n-issues">0</span></button>
+    <button role="tab" data-tab="model" aria-selected="false">Threat model</button>
+    <button role="tab" data-tab="insights" aria-selected="false">Insights</button>
+  </nav>
+  <div class="sp"></div>
+  <a class="btn ghost" href="/api/sarif" download title="Proven findings as SARIF 2.1.0, for GitHub code scanning or your IDE">Export SARIF</a>
+  <button class="btn" id="scan" title="Re-check every function in the project">Scan whole project</button>
+</header>
+<div class="body">
+  <main class="content">
+    <div class="view" id="v-issues">
+      <div class="headline"><h1 id="h1">Watching for changes</h1></div>
+      <p class="lede">Reva checks every function your agent saves. It only reports an issue after exploiting it
+        in a sandbox, and every fix is re-tested before you see it.</p>
+      <div class="working" id="working" hidden><span class="spin"></span><span id="worktext"></span><small id="worksub"></small></div>
+      <div id="issues"></div>
+      <div class="resolved" id="resolved"></div>
+    </div>
+    <div class="view" id="v-model" hidden></div>
+    <div class="view" id="v-insights" hidden></div>
+  </main>
+  <aside>
+    <div class="railh"><b>Activity</b><span id="railsum"></span></div>
+    <div id="activity"></div>
+    <div class="railf">Clean checks stay here. Only proven issues reach your inbox.</div>
+  </aside>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const clock = ts => new Date(ts * 1000).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit", second: "2-digit"});
+const base = p => String(p).split("/").pop();
+const S = {tm: null, findings: {}, seenAt: {}, log: [], counters: {}, repo: "", scanning: false, seen: 0,
+           open: {}, drawn: new Set(), tab: "issues", analytics: null, modelView: "table"};
+try { S.modelView = localStorage.getItem("reva.modelView") === "graph" ? "graph" : "table"; } catch (err) { /* storage blocked */ }
+
+/* ---------- plain-language copy ---------- */
+const KIND = {
+  "CWE-22": ["Path traversal", p => `<code>${p}</code> from the request is used to build a file path with no check that it stays inside the allowed folder.`],
+  "CWE-89": ["SQL injection", p => `<code>${p}</code> from the request is written into a SQL query instead of being passed as a parameter.`],
+  "CWE-918": ["Server-side request forgery", p => `<code>${p}</code> from the request is used as a URL the server fetches, with no allowlist.`],
+  "CWE-78": ["Command injection", p => `<code>${p}</code> from the request reaches a system command.`],
+  "CWE-88": ["Argument injection", p => `<code>${p}</code> is passed to a command-line tool, where a leading <code>-</code> is read as an option.`],
+  "CWE-502": ["Unsafe deserialization", p => `<code>${p}</code> from the request is deserialized, which can run attacker-chosen code.`],
+};
+const kindOf = f => KIND[f.cwe]?.[0] || f.cwe;
+const paramOf = f => (/unvalidated (\S+) reaches/.exec(f.title) || [])[1];
+function summary(f) {
+  const p = paramOf(f), k = KIND[f.cwe];
+  return p && k ? k[1](esc(p)) : esc(String(f.reasoning || "").split(". ")[0]);
+}
+function severity(f) {
+  const r = f.impact * f.likelihood;
+  return !r ? null : r >= 15 ? "high" : r >= 8 ? "medium" : "low";
+}
+const clean = s => String(s || "").replace(/\/tmp\/reva-(sandbox|patch)-[^/\s]+\/(work|target)\//g, "").replace(/^after patch:\s*/, "");
+const firstSentence = s => { const m = /^(.+?[.;,])\s/.exec(s); return m && m[1].length > 40 ? m[1].replace(/[;,]$/, ".") : s; };
+function diffStat(d) {
+  let a = 0, r = 0;
+  for (const l of String(d).split("\n")) { if (/^\+(?!\+\+ )/.test(l)) a++; else if (/^-(?!-- )/.test(l)) r++; }
+  return `+${a} −${r}`;
+}
+function codeHtml(text, diff = false) {
+  const lines = String(text).replace(/\s+$/, "").split("\n").filter(l => !diff || !/^(---|\+\+\+) /.test(l));
+  const cls = l => !diff ? "" : l[0] === "+" ? "a" : l[0] === "-" ? "d" : l[0] === "@" ? "h" : "";
+  return `<pre class="${diff ? "" : "wrap"}">${lines.map(l => `<div class="${cls(l)}">${esc(l) || " "}</div>`).join("")}</pre>`;
+}
+const toggle = (key, label, body) => `<button class="link" data-toggle="${esc(key)}" aria-expanded="${!!S.open[key]}">${S.open[key] ? "Hide" : label}</button>`
+  + (S.open[key] ? body : "");
+
+/* ---------- issues ---------- */
+function stages(f) {
+  const st = f.status;
+  const prove = st === "validating" ? "run" : st === "confirmed" || st === "patched" ? "ok" : "fail";
+  const fix = prove !== "ok" ? "wait" : f.patch ? "ok" : f.validation ? "fail" : "run";
+  const check = fix !== "ok" ? "wait" : st === "patched" ? "ok" : f.validation ? "fail" : "run";
+  return {prove, fix, check};
+}
+const ICON = {ok: "✓", fail: "!", run: "", wait: ""};
+function stepHtml(state, title, sub, body = "") {
+  return `<li class="${state}"><span class="ic ${state}">${ICON[state]}</span><div>`
+    + `<div class="tl"><b>${title}</b>${sub ? `<span>${sub}</span>` : ""}</div>${body}</div></li>`;
+}
+const editorUrl = f => S.repo ? `vscode://file/${S.repo.replace(/\/+$/, "")}/${f.file}:${f.line}` : "#";
+function issueHtml(f) {
+  const s = stages(f), sev = severity(f), k = f.id, proofText = clean(f.evidence);
+  const proof = stepHtml(s.prove, s.prove === "run" ? "Trying to exploit it in a sandbox…" : "Exploited in a sandbox", "",
+    s.prove === "ok" ? `<div class="tx">${esc(firstSentence(proofText))}</div>`
+      + toggle(k + ":proof", "Show exploit and output", codeHtml(proofText) + (f.exploit ? codeHtml(f.exploit) : "")) : "");
+  const fix = stepHtml(s.fix,
+    s.fix === "run" ? "Writing a fix…" : s.fix === "fail" ? "No fix could be generated" : s.fix === "ok" ? "Fix written" : "Write a fix",
+    s.fix === "ok" ? `${diffStat(f.patch)} in <code>${esc(base(f.file))}</code>` : "",
+    s.fix === "ok" ? toggle(k + ":diff", "View diff", codeHtml(f.patch, true))
+      : s.fix === "fail" ? `<div class="tx">Reva has proof but no patch it trusts. This one needs a human.</div>` : "");
+  const check = stepHtml(s.check,
+    s.check === "run" ? "Re-running the exploit against the fix…" : s.check === "ok" ? "Fix verified" : s.check === "fail" ? "Fix did not hold" : "Verify the fix",
+    s.check === "ok" ? "the same exploit no longer works on the patched code" : "",
+    s.check === "fail" ? `<div class="tx">${esc(firstSentence(clean(f.validation)))}</div>` : "");
+  const verified = f.status === "patched";
+  return `<div class="ih"><div class="ititle">${sev ? `<span class="sev ${sev}">${sev[0].toUpperCase() + sev.slice(1)}</span>` : ""}
+      <h2>${esc(kindOf(f))} in <code>${esc(f.function)}()</code></h2></div>
+    <div class="imeta"><a href="${esc(editorUrl(f))}" title="Open in VS Code">${esc(f.file)}:${f.line}</a><span>·</span><span>${esc(f.cwe)}</span>
+      ${S.seenAt[k] ? `<span>·</span><span>found ${clock(S.seenAt[k])}</span>` : ""}</div>
+    <p class="isum">${summary(f)}</p></div>
+    <ol class="trail">${proof}${fix}${check}</ol>
+    <div class="actions">
+      ${verified ? `<button class="btn primary" data-act="apply" data-id="${esc(k)}">Apply fix</button>` : ""}
+      ${f.patch ? `<button class="btn" data-act="copy" data-id="${esc(k)}">Copy diff</button>` : ""}
+      <a class="btn" href="${esc(editorUrl(f))}">Open in editor</a>
+      ${verified ? `<span class="note">Writes the verified patch to ${esc(base(f.file))}</span>` : ""}
+      <button class="btn ghost push" data-act="dismiss" data-id="${esc(k)}">Dismiss</button></div>`;
+}
+const inbox = () => Object.values(S.findings).filter(f => !f.resolution && ["confirmed", "patched"].includes(f.status));
+function renderIssues() {
+  const open = inbox().sort((a, b) => (S.seenAt[b.id] || 0) - (S.seenAt[a.id] || 0));
+  const n = open.length, checked = S.counters.screened || 0;
+  $("#issues").innerHTML = n ? open.map(f => `<article class="issue${S.drawn.has(f.id) ? "" : " new"}">${issueHtml(f)}</article>`).join("")
+    : `<div class="empty"><div class="big">✓</div><h3>${checked ? "Nothing needs you" : "Nothing to review yet"}</h3><p>${checked
+      ? `Reva checked ${checked} save${checked > 1 ? "s" : ""}${Object.values(S.findings).some(f => f.resolution === "applied")
+          ? " and everything it proved has been fixed" : " and found nothing it could exploit"}. You will only hear from it when it can prove a problem.`
+      : "Keep working. Reva checks each function as it is saved and stays silent unless it can prove a vulnerability."}</p></div>`;
+  open.forEach(f => S.drawn.add(f.id));
+  $("#n-issues").textContent = n;
+  $("#n-issues").classList.toggle("hot", n > 0);
+  $("#h1").textContent = n ? `${n} issue${n > 1 ? "s" : ""} need${n > 1 ? "" : "s"} your attention` : checked ? "All clear" : "Watching for changes";
+  document.title = n ? `(${n}) Reva` : "Reva";
+  const done = Object.values(S.findings).filter(f => f.resolution);
+  $("#resolved").innerHTML = done.length ? `<h3>Resolved</h3>` + done.map(f =>
+    `<div class="rrow"><span class="tag ${f.resolution}">${f.resolution === "applied" ? "Fix applied" : "Dismissed"}</span>`
+    + `<b>${esc(kindOf(f))} in <code>${esc(f.function)}()</code></b><span>${esc(f.file)}:${f.line}</span></div>`).join("") : "";
+  renderWorking();
+}
+function renderWorking() {
+  const live = Object.values(S.findings).filter(f => !f.resolution);
+  const busy = live.find(f => stages(f).prove === "run") || live.find(f => f.status === "confirmed" && (stages(f).fix === "run" || stages(f).check === "run"));
+  let text = "", sub = "";
+  if (busy) {
+    const s = stages(busy);
+    text = s.prove === "run" ? `Checking a possible ${kindOf(busy).replace(/^[A-Z](?=[a-z])/, c => c.toLowerCase())} in ${busy.function}()`
+      : s.fix === "run" ? `Proven. Writing a fix for ${busy.function}()` : `Re-testing the fix for ${busy.function}()`;
+    sub = s.prove === "run" ? "running the exploit in a sandbox" : "";
+  } else if (S.scanning) { text = "Scanning the whole project"; sub = `${S.counters.screened || 0} functions checked`; }
+  $("#working").hidden = !text;
+  $("#worktext").textContent = text;
+  $("#worksub").textContent = sub;
+}
+
+/* ---------- activity rail ---------- */
+const OUT = {checking: ["Checking", "run"], clear: ["No issue", ""], validating: ["Proving", "run"], suspected: ["Unproven", ""],
+  rejected: ["Not exploitable", ""], confirmed: ["Proven", "bad"], patched: ["Fix verified", "good"]};
+function renderActivity() {
+  $("#activity").innerHTML = S.log.slice().reverse().slice(0, 80).map(e => {
+    const [label, tone] = OUT[e.state] || [e.state, ""], key = "ev:" + e.id;
+    return `<div class="ev${S.drawn.has(key) ? "" : " new"}" data-toggle="${key}" title="Show the change"><div class="r1"><span class="fn">${esc(e.fn)}()</span><time>${clock(e.ts)}</time></div>`
+      + `<div class="r2"><span class="file">${esc(e.file)}</span><span class="pill ${tone}">${label}</span></div>`
+      + (S.open[key] && e.diff ? codeHtml(e.diff, true) : "") + `</div>`;
+  }).join("") || `<div class="muted" style="padding:8px 10px">Waiting for the first save.</div>`;
+  S.log.forEach(e => S.drawn.add("ev:" + e.id));
+  const c = S.counters;
+  $("#railsum").textContent = c.screened ? `${c.screened} checked · ${c.quiet || 0} clean` : "";
+}
+function logFor(fn) { for (let i = S.log.length - 1; i >= 0; i--) if (S.log[i].fn === fn) return S.log[i]; }
+
+/* ---------- threat model ---------- */
+const SINK = {path: "file path", sql: "SQL query", http: "outbound request", exec: "system command", git_arg: "git argument",
+              write: "file write", deserialize: "deserialization"};
+function graphHtml(tm) {
+  const NW = 260, NH = 44, ROW = 54, GAP = 300, TOP = 34, PAD = 2;
+  const nodes = new Map(), edges = [];
+  const node = (key, col, props) => nodes.get(key) || nodes.set(key, {key, col, open: 0, safe: 0, ...props}).get(key);
+  const issue = fn => Object.values(S.findings).filter(f => f.function === fn && ["confirmed", "patched"].includes(f.status));
+  for (const f of tm.flows) {
+    const a = node(`s:${f.source.function}.${f.source.param}`, 0, {label: f.source.param, mono: true, sub: `${f.source.function}()`,
+      title: `${f.source.file}:${f.source.line}`, src: true});
+    const mid = f.path.filter(p => p !== f.source.function && p !== f.sink.function)
+      .map(p => node("f:" + p, 1, {label: p + "()", mono: true, sub: "passes it on"}));
+    const b = node(`k:${f.sink.file}:${f.sink.line}:${f.sink.kind}`, 2, {label: `${f.sink.function}()`, mono: true,
+      sub: `${SINK[f.sink.kind] || f.sink.kind} · line ${f.sink.line}`, title: f.sink.code, fn: f.sink.function});
+    const chain = [a, ...mid, b];
+    chain.forEach(n => n[f.guarded ? "safe" : "open"]++);
+    for (let i = 0; i < chain.length - 1; i++)
+      edges.push({a: chain[i], b: chain[i + 1], open: !f.guarded,
+                  title: f.guarded ? `guarded by ${f.guards.join(", ")}` : "no recognised guard"});
+  }
+  for (const c of tm.agent?.candidates || []) if (c.decision !== "dismissed")
+    node(`c:${c.role}:${c.file}:${c.function}`, c.role === "entry" ? 0 : 2, {label: `${c.function}()`, mono: true,
+      sub: `agent suggestion · ${c.kind}`, title: c.reason, cand: true});
+  const all = [...nodes.values()];
+  const hasMid = all.some(n => n.col === 1);
+  const cols = hasMid ? [0, 1, 2] : [0, 2];
+  const x = c => PAD + cols.indexOf(c) * (NW + GAP);
+  const rank = n => n.cand ? 2 : n.open ? 0 : 1;            // unguarded first, agent suggestions last
+  // sinks first (unguarded on top), then every earlier column ordered by where its edges land: few crossings
+  const rows = cols.map(() => []);
+  rows[rows.length - 1] = all.filter(n => n.col === 2).sort((p, q) => rank(p) - rank(q) || p.label.localeCompare(q.label));
+  for (let ci = cols.length - 2; ci >= 0; ci--) {
+    const next = rows[ci + 1], at = new Map(next.map((n, i) => [n, i]));
+    const bary = n => { const ys = edges.filter(e => e.a === n && at.has(e.b)).map(e => at.get(e.b)); return ys.length ? ys.reduce((a, b) => a + b) / ys.length : 1e9; };
+    rows[ci] = all.filter(n => n.col === cols[ci]).sort((p, q) => bary(p) - bary(q) || rank(p) - rank(q));
+  }
+  const tall = Math.max(1, ...rows.map(r => r.length));
+  const H = TOP + tall * ROW, W = 2 * PAD + cols.length * NW + (cols.length - 1) * GAP;
+  rows.forEach(r => r.forEach((n, i) => { n.x = x(n.col); n.y = TOP + i * ROW + (tall - r.length) * ROW / 2; }));
+  const state = n => {
+    if (n.cand) return "cand";
+    if (n.src) return "src";
+    const fs = (n.fn ? issue(n.fn) : []).filter(f => f.resolution !== "dismissed");
+    if (fs.some(f => !f.resolution)) return "proven";          // still in the code until the fix is applied
+    if (fs.length) return "fixed";
+    return n.open ? "open" : "safe";
+  };
+  const cut = (t, k) => t.length > k ? t.slice(0, k - 1) + "…" : t;
+  const heads = (hasMid ? ["User input", "Through", "Sensitive operation"] : ["User input", "Sensitive operation"])
+    .map((h, i) => `<text class="colh" x="${PAD + i * (NW + GAP)}" y="16">${h}</text>`).join("");
+  const paths = edges.sort((p, q) => p.open - q.open).map(e => {
+    const x1 = e.a.x + NW, y1 = e.a.y + NH / 2, x2 = e.b.x, y2 = e.b.y + NH / 2, m = (x1 + x2) / 2;
+    return `<path class="gedge${e.open ? " open" : ""}" d="M${x1},${y1} C${m},${y1} ${m},${y2} ${x2},${y2}"><title>${esc(e.title)}</title></path>`;
+  }).join("");
+  const boxes = all.map(n => {
+    const st = state(n);
+    const tag = st === "proven" ? "proven" : st === "fixed" ? "fixed" : "";
+    return `<g class="gnode ${st}"><title>${esc(n.title || n.label)}</title>`
+      + `<rect x="${n.x}" y="${n.y}" width="${NW}" height="${NH}" rx="8"/>`
+      + `<text class="${n.mono ? "mono" : ""}" x="${n.x + 14}" y="${n.y + 19}">${esc(cut(n.label, 26))}</text>`
+      + `<text class="sub" x="${n.x + 14}" y="${n.y + 35}">${esc(cut(n.sub, 36))}</text>`
+      + (tag ? `<text class="sub" x="${n.x + NW - 12}" y="${n.y + 19}" text-anchor="end" style="fill:var(--${tag === "proven" ? "danger" : "success"});font-weight:600">${tag}</text>` : "")
+      + `</g>`;
+  }).join("");
+  return `<div class="graph"><svg viewBox="0 0 ${W} ${H}" style="max-width:${W}px;margin:0 auto" role="img" aria-label="Threat model graph: user inputs to sensitive operations">${heads}${paths}${boxes}</svg></div>
+    <div class="glegend"><span><i style="border-color:var(--danger)"></i>no recognised guard</span>
+      <span><i style="border-color:var(--success)"></i>guarded</span>
+      <span><b style="border-color:var(--danger);background:var(--danger-bg)"></b>proven exploitable</span>
+      <span><b style="border-color:var(--success);background:var(--success-bg)"></b>fixed</span>
+      ${tm.agent?.candidates?.length ? `<span><b style="border-color:var(--brand);border-style:dashed"></b>agent suggestion</span>` : ""}
+      <span>Hover a box or line for code and guards.</span></div>`;
+}
+function renderModel() {
+  const tm = S.tm, el = $("#v-model");
+  if (!tm) { el.innerHTML = `<div class="headline"><h1>Threat model</h1></div><div class="empty"><h3>No threat model yet</h3><p>Run a scan to map where user input reaches sensitive operations.</p></div>`; return; }
+  const flows = tm.flows.slice().sort((a, b) => a.guarded - b.guarded);
+  const open = flows.filter(f => !f.guarded).length, a = tm.agent;
+  const view = S.modelView;
+  el.innerHTML = `<div class="headline"><h1>Threat model</h1><div class="seg" role="group" aria-label="View">
+      <button data-view="table" aria-pressed="${view === "table"}">Table</button><button data-view="graph" aria-pressed="${view === "graph"}">Graph</button></div></div>
+    <p class="lede">${tm.flows.length} paths where user input reaches a sensitive operation, ${open} without a recognised guard.
+      Reva re-checks a path every time a function on it is saved.</p>
+    ${view === "graph" ? `<div class="sec"><div class="card">${graphHtml(tm)}</div></div>` : `<div class="sec"><div class="card tablewrap"><table><thead><tr><th>Status</th><th>User input</th><th>Reaches</th><th>Guarded by</th></tr></thead><tbody>
+    ${flows.map(f => `<tr><td><span class="st ${f.guarded ? "guarded" : "open"}">${f.guarded ? "Guarded" : "Unguarded"}</span></td>
+      <td><code>${esc(f.source.param)}</code><small>${esc(f.source.function)}() · ${esc(f.source.file)}:${f.source.line}</small></td>
+      <td>${esc(SINK[f.sink.kind] || f.sink.kind)}<small><code>${esc(f.sink.code)}</code> · line ${f.sink.line}</small></td>
+      <td>${f.guards?.length ? f.guards.map(g => `<code>${esc(g)}</code>`).join(", ") : `<span class="muted">nothing</span>`}</td></tr>`).join("")}
+    </tbody></table></div></div>`}
+    ${a ? `<div class="sec"><div class="headline"><h1 style="font-size:18px">Suggestions from the agent review</h1><span class="badge">needs your review</span></div>
+      <p class="lede">An LLM read the code for what static analysis cannot see. Its suggestions never raise an alarm on their own.</p>
+      ${a.candidates?.length ? `<div class="card" style="margin-bottom:12px">${a.candidates.map((c, i) => `<div class="prop ${c.decision}">
+        <div><b>${c.role === "sink" ? "Possible missed sensitive operation" : "Possible missed entry point"}: <code>${esc(c.function)}()</code></b>
+        <p>${esc(c.reason)} <span class="muted">· ${esc(c.file)}</span></p></div>
+        <div>${c.decision ? `<span class="muted">${c.decision === "accepted" ? "Accepted" : "Dismissed"}</span> <button class="btn ghost sm" data-cand="${i}" data-d="none">Undo</button>`
+          : `<button class="btn sm" data-cand="${i}" data-d="accepted">Accept</button> <button class="btn ghost sm" data-cand="${i}" data-d="dismissed">Dismiss</button>`}</div></div>`).join("")}</div>` : ""}
+      <div class="notes">
+        ${[["What is worth protecting", a.assets], ["Trust boundaries", a.trust_boundaries],
+           ["Questions asked on every save", (a.questions || []).map(q => q.replace(/^\[agent\]\s*/, ""))]]
+          .filter(([, xs]) => xs?.length).map(([t, xs]) => `<div class="card"><h4>${t}</h4><ul>${xs.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")}
+      </div></div>` : ""}`;
+}
+
+/* ---------- insights (ClickHouse) ---------- */
+const big = n => n >= 10000 ? (n / 1000).toFixed(1) + "k" : (n ?? 0).toLocaleString();
+function renderInsights() {
+  const a = S.analytics, el = $("#v-insights");
+  if (!a?.enabled) {
+    el.innerHTML = `<div class="headline"><h1>Insights</h1></div><div class="empty"><h3>Calibration memory is off</h3>
+      <p>Connect ClickHouse (<code>REVA_CLICKHOUSE_HOST</code>) and every verdict becomes a label that tunes which changes are worth proving.</p></div>`;
+    return;
+  }
+  const t = a.totals || {}, l = a.latency || {};
+  el.innerHTML = `<div class="headline"><h1>Insights</h1><span class="badge">ClickHouse</span></div>
+    <p class="lede">Every screening and every sandbox verdict is stored. Reva uses that history to decide which changes are worth an expensive proof${
+      l.n ? `, at ${l.p50} ms per lookup (p99 ${l.p99} ms)` : ""}.</p>
+    <div class="stats">${[["Changes screened", t.screenings], ["Sent to the sandbox", t.escalated], ["Sandbox verdicts", t.labelled], ["Cleared without a model call", t.quiet]]
+      .map(([k, v]) => `<div class="card stat"><b>${big(v)}</b><span>${k}</span></div>`).join("")}</div>
+    <div class="card tablewrap"><table><thead><tr><th>Operation</th><th>Proven exploitable</th><th></th><th>Verdicts</th></tr></thead><tbody>
+    ${(a.by_sink || []).map(s => { const p = Math.round((s.rate ?? 0) * 100);
+      return `<tr><td>${esc(SINK[s.sink_kind] || s.sink_kind)}</td><td>${p}%</td><td style="width:40%"><div class="meter"><i style="width:${p}%"></i></div></td>
+        <td>${s.total}${s.trusted ? "" : ` <span class="muted">· too few to use yet</span>`}</td></tr>`; }).join("")
+      || `<tr><td colspan="4" class="muted">No verdicts yet.</td></tr>`}
+    </tbody></table></div>`;
+}
+
+/* ---------- render scheduling ---------- */
+let queued = false;
+function render() {
+  if (queued) return;
+  queued = true;
+  requestAnimationFrame(() => {
+    queued = false;
+    renderIssues(); renderActivity();
+    if (S.tab === "model") renderModel();
+    if (S.tab === "insights") renderInsights();
+  });
+}
+
+/* ---------- events ---------- */
+function onEdit(e) {
+  S.log.push({id: e.id, ts: e.ts, fn: e.data.function, file: e.data.file, diff: e.data.diff, state: "checking"});
+  if (S.log.length > 300) S.log.shift();
+}
+function onQuiet(e) { const x = logFor(e.data.function); if (x) x.state = "clear"; }
+function onFinding(e) {
+  const f = e.data;
+  S.seenAt[f.id] ??= e.ts;
+  S.findings[f.id] = f;
+  const x = logFor(f.function);
+  if (x) x.state = f.status;
+}
+function onScan(e) {
+  const s = e.data.state, known = ["start", "threat model", "scanning", "watching", "done"].includes(s);
+  if (known) S.scanning = ["start", "threat model", "scanning"].includes(s);
+  $("#scan").disabled = S.scanning;
+  if (e.data.repo) setRepo(e.data.repo);
+  if (!known && S.seen) toast(s, true);     // an error notice from the watcher; old ones are not replayed as toasts
+}
+function setRepo(r) { S.repo = r || ""; $("#repo").textContent = r ? base(r.replace(/\/+$/, "")) : "—"; $("#repo").title = r || ""; }
+const H = {edit: onEdit, quiet: onQuiet, scan: onScan, finding: onFinding,
+  counters: e => { S.counters = e.data; }, threatmodel: e => { S.tm = e.data; }};
+
+function connect() {
+  const es = new EventSource("/api/events" + (S.seen ? "?after=" + S.seen : ""));
+  const set = (c, t) => { $("#dot").className = "live " + c; $("#connt").textContent = t; };
+  es.onopen = () => set("ok", "watching");
+  es.onerror = () => { set("bad", "reconnecting…"); es.close(); setTimeout(reconnect, 1500); };
+  for (const type in H) es.addEventListener(type, m => {
+    const ev = JSON.parse(m.data);
+    if (ev.id <= S.seen) return;
+    S.seen = ev.id;
+    H[type](ev);
+    render();
+  });
+}
+async function reconnect() {
+  try {
+    const st = await (await fetch("/api/state")).json();
+    if (st.last_id < S.seen) return location.reload();   // server restarted: its event ids rewound
+  } catch (err) { /* still down: EventSource will retry */ }
+  connect();
+}
+async function boot() {
+  try {
+    const st = await (await fetch("/api/state")).json();
+    setRepo(st.repo);
+    for (const e of st.events) if (["edit", "quiet", "scan", "finding"].includes(e.type)) H[e.type](e);
+    S.tm = st.threat_model;
+    S.counters = st.counters || {};
+    for (const f of st.findings) S.findings[f.id] = f;   // the latest state wins over replayed history
+    S.seen = st.last_id;
+    Object.keys(S.findings).forEach(id => S.drawn.add(id));
+    S.log.forEach(e => S.drawn.add("ev:" + e.id));
+  } catch (err) {
+    $("#connt").textContent = "server unreachable";
+  }
+  render();
+  connect();
+}
+
+/* ---------- interactions ---------- */
+let toastT;
+function toast(msg, err = false) {
+  const t = $("#toast");
+  t.textContent = msg; t.className = "on" + (err ? " err" : "");
+  clearTimeout(toastT); toastT = setTimeout(() => t.className = "", 3600);
+}
+async function post(url) {
+  const r = await fetch(url, {method: "POST"});
+  if (!r.ok) {
+    let msg = `Request failed (${r.status})`;
+    try { msg = (await r.json()).detail || msg; } catch (err) { /* keep the status */ }
+    throw new Error(msg);
+  }
+  return r.json();
+}
+document.addEventListener("click", async e => {
+  const t = e.target.closest("[data-toggle],[data-act],[data-cand],[data-view],nav button");
+  if (!t || e.target.closest("pre")) return;
+  if (t.dataset.tab) {
+    S.tab = t.dataset.tab;
+    document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-selected", b === t));
+    document.querySelectorAll(".view").forEach(v => v.hidden = v.id !== "v-" + S.tab);
+    if (S.tab === "model") renderModel();
+    if (S.tab === "insights") { renderInsights(); memory(); }
+    return;
+  }
+  if (t.dataset.view) {
+    S.modelView = t.dataset.view;
+    try { localStorage.setItem("reva.modelView", S.modelView); } catch (err) { /* storage blocked */ }
+    return renderModel();
+  }
+  if (t.dataset.toggle) { S.open[t.dataset.toggle] = !S.open[t.dataset.toggle]; return render(); }
+  if (t.dataset.cand !== undefined) {
+    try { await post(`/api/candidates/${t.dataset.cand}/${t.dataset.d}`); } catch (err) { toast(err.message, true); }
+    return;
+  }
+  const f = S.findings[t.dataset.id];
+  if (!f) return;
+  if (t.dataset.act === "copy") {
+    try { await navigator.clipboard.writeText(f.patch); toast("Diff copied"); } catch (err) { toast("Could not copy: the browser blocked the clipboard", true); }
+    return;
+  }
+  t.disabled = true;
+  try {
+    await post(`/api/findings/${encodeURIComponent(f.id)}/${t.dataset.act}`);
+    toast(t.dataset.act === "apply" ? `Fix applied to ${base(f.file)}` : "Dismissed");
+  } catch (err) { toast(err.message, true); t.disabled = false; }
+});
+$("#scan").onclick = async () => {
+  $("#scan").disabled = true;
+  try { await post("/api/scan"); } catch (err) { toast(err.message, true); $("#scan").disabled = false; }
+};
+
+async function memory() {
+  try { S.analytics = await (await fetch("/api/analytics")).json(); } catch (err) { return; }
+  if (S.tab === "insights") renderInsights();
+}
+setInterval(() => { if (S.tab === "insights") memory(); }, 5000);
+
+boot();
+memory();
+</script>
+</body>
+</html>

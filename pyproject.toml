@@ -1,0 +1,24 @@
+[project]
+name = "reva"
+version = "0.1.0"
+description = "Real-time vulnerability analysis for code written by coding agents"
+requires-python = ">=3.11"
+dependencies = ["fastapi", "uvicorn", "openai", "watchfiles", "pydantic>=2", "gitpython", "mcp<2"]
+
+[project.optional-dependencies]
+dev = ["pytest", "jsonschema"]   # jsonschema: the SARIF export is checked against the OASIS schema
+semgrep = ["semgrep"]   # optional: corroborating evidence from p/guardian-default; Reva runs without it
+clickhouse = ["clickhouse-connect"]   # optional: the calibration memory; Reva runs without it
+demo = ["playwright"]   # only for demo/record_demo.py; then `playwright install chromium`
+
+[project.scripts]
+reva = "reva.cli:main"
+
+[tool.setuptools]
+packages = ["reva"]
+
+[tool.setuptools.package-data]
+reva = ["schema.sql"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
