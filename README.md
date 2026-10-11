@@ -455,3 +455,8 @@ second language. Replace the temp-dir sandbox with a container and a network-den
 indexed by, which today cannot tell a genuinely vulnerable `git_arg` flow from one mitigated by a guard Reva does not
 recognise. Then move upstream: run the same gate inside the agent's own edit loop, so an agent is told its patch is exploitable
 before it moves on to the next file.
+
+## Contributors
+
+- [AmL-Dev](https://github.com/AmL-Dev)
+- [Mahmudul Hoque](https://github.com/HoqueMahmudul)
